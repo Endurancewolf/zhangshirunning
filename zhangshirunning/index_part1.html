@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>张师快跑</title>
+    <style>
+        /* ========== 页面样式 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            /* 防止页面滚动（空格键默认行为） */
+            touch-action: none;
+        }
+
+        /* 游戏容器：给画布加一圈装饰边框 */
+        .game-container {
+            position: relative;
+            border: 4px solid #FFD700;
+            border-radius: 12px;
+            box-shadow:
+                0 0 30px rgba(255, 215, 0, 0.3),
+                0 0 60px rgba(255, 215, 0, 0.1),
+                0 8px 32px rgba(0, 0, 0, 0.5);
+            /* 圆角裁切 */
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            /* 防止 canvas 默认的 inline 间隙 */
+        }
+
+        /* 底部提示 */
+        .hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 游戏画布容器 -->
+    <div class="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <audio id="bgmAudio" src="__BGM_URI__" loop></audio>
+        <img id="playerImg" src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCASeA3cDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD8qqKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKMGlCMex/KgBKKMUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFA4oowaAFAzk0qxljgDJ9qByAO9dx8NvC41e+muZxm3tRuYHvQLZGZ4f+H+r68VNtas6scZxXc6d8CJI2zqV4tsV5MRPJrsL3xn/AGHpr2tjEsbv/GgwVrhr3xbfXOZZp2lkH8THmg5XXadjrtC+D/hKTXWtry+Ihih81pB0J/u1Zs7TQYLry7S3ja1DbFDj9a84t9cupJHLOwVuuDVldf8As6lVGXHQmnYxeIn0O51b4T6P4hVBayx2M7Mxyv3TWRc/s/TaDbma8PnfPs2Rv83+8BWRbeMZ4+xB9QasjxjdXHMs8k0nqT81IccTLqjA8XfDF9Lge6sC08Q6xMMOv1rzx0Kk5FfUnh/xTafYP9Li83y0+/8Awv7Vz2t/DDQPFlz51gTZTTN93OFQ43c0HRGrc+eqK6bxf4CvvCdyyTDzYx/y0UcVzNBsncKKKKCgooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiigcUAGK6bw94F1XxCnmW0BEA6yvwtb/gzwZZwWi6xrYJtz/x72o+9O3/AMTXTP4/ukfCLbRwRcRWaR/ukH+73P8AtNQZSnymBpnwgmuT815Ec9WjVn2/lXod/wCH9M+H/hcabb3a3F0zCe4YdfZa5+4+KviSbTzBNqsi25/5ZKAg/SuLvtZkuXZmcuT1LGmkYyqOSsie91qWYnnaKzHnLg1XebeTmmZJzitEc9i7FcbEPNU5bs7zikCseBzUq2Eh52k0kyGrhHcvg1JFcuHz3pUsZjwI2P4VN/ZF5jIgfH0oug5TUi1WVLZUre8O629vdwP6GuTLZj+lTWN6Uljx2NTdBqe4fFDSrfXfhxLfIA0xeRsj86+UpV2SMPevqiSfzvg3cD+6X/UCvlm6/wBc/wBak9Cm7xIqKKKDYKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigBQMiul8AeHj4h8R2lrt3IWBb6VzaHAOelej/BfWoNI155JQCzLtj+tAHo/jjw/p9hbmXUNVt7XUPJXyNPt08yRIf4Q2Ojf3q8mubgcqgKMO5r6L+NXxB0Twx8PtP8EeGdJs7Wa4T7Vq+sSQiS7u27L5h6CvmeW4MhPJP1po45sgOcmjNB6mkHNWjMcF4qWGLfTVHFW7NNxpgdd4R8Gf2pMu5c5r2HRPgzFcRqTGPyrj/h7fxwzKSO4r6L8L6pFJAh4rxcVWnF+6ezg8PTmtTktO+BlkpBeIflXc6N8ENGljCvEh+orqLKVZxxWtab4jwTXjyr1H1PoaeEpJbFCz/ZP8H+IR/pFgj+6IF/lXE/FT/gnBMmkyav4Hu2uJ4l3tpk/wDF9DX0p4T1vasZ2gZwDXr3h
